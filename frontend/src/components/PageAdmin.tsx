@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -11,7 +12,6 @@ import {
 } from '@mui/material';
 import { AdminPanelSettings } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from '../contexts/NavigationContext';
 import ThemeToggle from './ThemeToggle';
 
 /**
@@ -24,11 +24,11 @@ const PageAdmin: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('login');
+    navigate('/login');
   };
 
   const handleGoToUsers = () => {
-    navigate('users');
+    navigate('/users');
   };
 
   return (

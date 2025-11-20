@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -10,11 +11,8 @@ import {
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
 
-interface PageConnexionProps {
-  onLoginSuccess: () => void;
-}
-
-const PageConnexion: React.FC<PageConnexionProps> = ({ onLoginSuccess }) => {
+const PageConnexion: React.FC = () => {
+  const navigate = useNavigate();
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -33,7 +31,7 @@ const PageConnexion: React.FC<PageConnexionProps> = ({ onLoginSuccess }) => {
 
     if (success) {
       // Redirection vers /users
-      onLoginSuccess();
+      navigate('/users');
     } else {
       setError('Identifiants invalides');
     }

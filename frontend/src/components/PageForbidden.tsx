@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -7,7 +8,6 @@ import {
   Button,
 } from '@mui/material';
 import { LockOutlined } from '@mui/icons-material';
-import { useNavigate } from '../contexts/NavigationContext';
 import { useAuth } from '../contexts/AuthContext';
 
 const PageForbidden: React.FC = () => {
@@ -15,12 +15,12 @@ const PageForbidden: React.FC = () => {
   const { userRole, logout } = useAuth();
 
   const handleGoBack = () => {
-    navigate('users');
+    navigate('/users');
   };
 
   const handleLogout = () => {
     logout();
-    navigate('login');
+    navigate('/login');
   };
 
   return (

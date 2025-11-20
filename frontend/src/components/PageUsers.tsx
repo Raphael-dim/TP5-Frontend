@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -10,7 +11,6 @@ import {
   Alert,
 } from '@mui/material';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from '../contexts/NavigationContext';
 import { useUsers } from '../hooks/useUsers';
 import Tableau from '../components/Tableau';
 import ThemeToggle from '../components/ThemeToggle';
@@ -22,11 +22,11 @@ const PageUsers: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('login');
+    navigate('/login');
   };
 
   const handleGoToAdmin = () => {
-    navigate('admin');
+    navigate('/admin');
   };
 
   return (

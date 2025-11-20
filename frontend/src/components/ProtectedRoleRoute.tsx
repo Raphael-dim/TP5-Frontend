@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from '../contexts/NavigationContext';
 
 interface ProtectedRoleRouteProps {
   rolesRequis: Array<'admin' | 'user' | 'guest'>;
@@ -20,29 +20,19 @@ interface ProtectedRoleRouteProps {
  */
 const ProtectedRoleRoute: React.FC<ProtectedRoleRouteProps> = ({ rolesRequis, children }) => {
   const { isAuthenticated, userRole } = useAuth();
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    // Vérifier si l'utilisateur est connecté
-    if (!isAuthenticated) {
-      navigate('login');
-      return;
-    }
-
-    // Vérifier si l'utilisateur a un des rôles requis
-    if (userRole && !rolesRequis.includes(userRole)) {
-      navigate('forbidden');
-      return;
-    }
-  }, [isAuthenticated, userRole, rolesRequis, navigate]);
-
-  // Si l'utilisateur est connecté ET a le bon rôle, afficher le composant enfant
-  if (isAuthenticated && userRole && rolesRequis.includes(userRole)) {
-    return <>{children}</>;
+  // Vérifier si l'utilisateur est connecté
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  // Pendant la vérification ou redirection, ne rien afficher
-  return null;
+  // Vérifier si l'utilisateur a un des rôles requis
+  if (userRole && !rolesRequis.includes(userRole)) {
+    return <Navigate to="/forbidden" replace />;
+  }
+
+  // Si l'utilisateur est connecté ET a le bon rôle, afficher le composant enfant
+  return <>{children}</>;
 };
 
 export default ProtectedRoleRoute;

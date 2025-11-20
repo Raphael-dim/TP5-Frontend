@@ -1,9 +1,9 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useTheme } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
-import { NavigationProvider, useCurrentPage, useNavigate } from './contexts/NavigationContext';
 import { useAuth } from './contexts/AuthContext';
 import PageConnexion from './components/PageConnexion';
 import PageUsers from './components/PageUsers';
@@ -13,8 +13,6 @@ import ProtectedRoleRoute from './components/ProtectedRoleRoute';
 
 function AppContent() {
   const { theme } = useTheme();
-  const currentPage = useCurrentPage();
-  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
   const muiTheme = React.useMemo(
@@ -33,34 +31,53 @@ function AppContent() {
     [theme],
   );
 
-  // Protection des routes
-  React.useEffect(() => {
-    if (!isAuthenticated && (currentPage === 'users' || currentPage === 'forbidden' || currentPage === 'admin')) {
-      navigate('login');
-    }
-  }, [isAuthenticated, currentPage, navigate]);
-
-  const handleLoginSuccess = () => {
-    navigate('users');
-  };
-
   return (
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />
-      {currentPage === 'login' && !isAuthenticated && (
-        <PageConnexion onLoginSuccess={handleLoginSuccess} />
-      )}
-      {currentPage === 'users' && isAuthenticated && (
-        <ProtectedRoleRoute rolesRequis={['admin', 'user', 'guest']}>
-          <PageUsers />
-        </ProtectedRoleRoute>
-      )}
-      {currentPage === 'admin' && isAuthenticated && (
-        <ProtectedRoleRoute rolesRequis={['admin']}>
-          <PageAdmin />
-        </ProtectedRoleRoute>
-      )}
-      {currentPage === 'forbidden' && isAuthenticated && <PageForbidden />}
+      <Routes>
+        {/* Route de connexion */}
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated ? <Navigate to="/users" replace /> : <PageConnexion />
+          } 
+        />
+
+        {/* Route protégée - accessible à tous les rôles */}
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoleRoute rolesRequis={['admin', 'user', 'guest']}>
+              <PageUsers />
+            </ProtectedRoleRoute>
+          }
+        />
+
+        {/* Route protégée - accessible uniquement aux admins */}
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoleRoute rolesRequis={['admin']}>
+              <PageAdmin />
+            </ProtectedRoleRoute>
+          }
+        />
+
+        {/* Route forbidden - 403 */}
+        <Route path="/forbidden" element={<PageForbidden />} />
+
+        {/* Route par défaut - redirige vers login ou users */}
+        <Route 
+          path="/" 
+          element={<Navigate to={isAuthenticated ? "/users" : "/login"} replace />} 
+        />
+
+        {/* Route 404 - toutes les autres routes */}
+        <Route 
+          path="*" 
+          element={<Navigate to={isAuthenticated ? "/users" : "/login"} replace />} 
+        />
+      </Routes>
     </MuiThemeProvider>
   );
 }
@@ -69,9 +86,9 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <NavigationProvider>
+        <Router>
           <AppContent />
-        </NavigationProvider>
+        </Router>
       </AuthProvider>
     </ThemeProvider>
   );
