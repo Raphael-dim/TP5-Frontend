@@ -7,6 +7,9 @@ import { NavigationProvider, useCurrentPage, useNavigate } from './contexts/Navi
 import { useAuth } from './contexts/AuthContext';
 import PageConnexion from './components/PageConnexion';
 import PageUsers from './components/PageUsers';
+import PageForbidden from './components/PageForbidden';
+import PageAdmin from './components/PageAdmin';
+import ProtectedRoleRoute from './components/ProtectedRoleRoute';
 
 function AppContent() {
   const { theme } = useTheme();
@@ -32,7 +35,7 @@ function AppContent() {
 
   // Protection des routes
   React.useEffect(() => {
-    if (!isAuthenticated && currentPage === 'users') {
+    if (!isAuthenticated && (currentPage === 'users' || currentPage === 'forbidden' || currentPage === 'admin')) {
       navigate('login');
     }
   }, [isAuthenticated, currentPage, navigate]);
@@ -47,7 +50,17 @@ function AppContent() {
       {currentPage === 'login' && !isAuthenticated && (
         <PageConnexion onLoginSuccess={handleLoginSuccess} />
       )}
-      {currentPage === 'users' && isAuthenticated && <PageUsers />}
+      {currentPage === 'users' && isAuthenticated && (
+        <ProtectedRoleRoute rolesRequis={['admin', 'user', 'guest']}>
+          <PageUsers />
+        </ProtectedRoleRoute>
+      )}
+      {currentPage === 'admin' && isAuthenticated && (
+        <ProtectedRoleRoute rolesRequis={['admin']}>
+          <PageAdmin />
+        </ProtectedRoleRoute>
+      )}
+      {currentPage === 'forbidden' && isAuthenticated && <PageForbidden />}
     </MuiThemeProvider>
   );
 }

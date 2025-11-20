@@ -25,6 +25,10 @@ const PageUsers: React.FC = () => {
     navigate('login');
   };
 
+  const handleGoToAdmin = () => {
+    navigate('admin');
+  };
+
   return (
     <Box
       sx={{
@@ -43,6 +47,11 @@ const PageUsers: React.FC = () => {
             Rôle: <strong>{userRole}</strong>
           </Typography>
           <ThemeToggle />
+          {userRole === 'admin' && (
+            <Button color="inherit" onClick={handleGoToAdmin} sx={{ ml: 2 }}>
+              Admin
+            </Button>
+          )}
           <Button color="inherit" onClick={handleLogout} sx={{ ml: 2 }}>
             Déconnexion
           </Button>

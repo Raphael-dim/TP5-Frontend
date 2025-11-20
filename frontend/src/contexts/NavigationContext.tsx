@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
-type Page = 'login' | 'users';
+type Page = 'login' | 'users' | 'forbidden' | 'admin';
 
 interface NavigationContextType {
   currentPage: Page;
