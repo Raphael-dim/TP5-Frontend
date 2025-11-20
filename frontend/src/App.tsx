@@ -1,14 +1,18 @@
 import React from 'react';
-import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline, AppBar, Toolbar, Typography, Container, Box, CircularProgress, Alert, Button } from '@mui/material';
+import { ThemeProvider as MuiThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { useTheme } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
-import Tableau from './components/Tableau';
-import { useUsers } from './hooks/useUsers';
+import { AuthProvider } from './contexts/AuthContext';
+import { NavigationProvider, useCurrentPage, useNavigate } from './contexts/NavigationContext';
+import { useAuth } from './contexts/AuthContext';
+import PageConnexion from './components/PageConnexion';
+import PageUsers from './components/PageUsers';
 
 function AppContent() {
   const { theme } = useTheme();
-  const { users, loading, error, refetch } = useUsers();
+  const currentPage = useCurrentPage();
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const muiTheme = React.useMemo(
     () =>
@@ -26,42 +30,24 @@ function AppContent() {
     [theme],
   );
 
+  // Protection des routes
+  React.useEffect(() => {
+    if (!isAuthenticated && currentPage === 'users') {
+      navigate('login');
+    }
+  }, [isAuthenticated, currentPage, navigate]);
+
+  const handleLoginSuccess = () => {
+    navigate('users');
+  };
+
   return (
     <MuiThemeProvider theme={muiTheme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'background.default' }}>
-        <AppBar position="static" elevation={2}>
-          <Toolbar>
-            <Typography variant="h5" component="h1" sx={{ flexGrow: 1, fontWeight: 'bold' }}>
-              Gestion des Utilisateurs
-            </Typography>
-            <ThemeToggle />
-          </Toolbar>
-        </AppBar>
-
-        <Container maxWidth="xl" sx={{ mt: 4, mb: 4, flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {loading && (
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-              <CircularProgress size={60} />
-              <Typography variant="h6" sx={{ mt: 2 }}>
-                Chargement des utilisateurs...
-              </Typography>
-            </Box>
-          )}
-
-          {error && (
-            <Alert severity="error" sx={{ mb: 3 }} action={
-              <Button color="inherit" size="small" onClick={refetch}>
-                Réessayer
-              </Button>
-            }>
-              {error}
-            </Alert>
-          )}
-
-          {!loading && !error && <Tableau data={users} />}
-        </Container>
-      </Box>
+      {currentPage === 'login' && !isAuthenticated && (
+        <PageConnexion onLoginSuccess={handleLoginSuccess} />
+      )}
+      {currentPage === 'users' && isAuthenticated && <PageUsers />}
     </MuiThemeProvider>
   );
 }
@@ -69,7 +55,11 @@ function AppContent() {
 function App() {
   return (
     <ThemeProvider>
-      <AppContent />
+      <AuthProvider>
+        <NavigationProvider>
+          <AppContent />
+        </NavigationProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
