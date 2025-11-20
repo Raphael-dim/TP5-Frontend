@@ -2,6 +2,10 @@
 
 Application full-stack avec React, TypeScript, Node.js/Express et MongoDB suivant une architecture clean code.
 
+## Lien du Git
+[TP5 Frontend](https://github.com/Raphael-dim/TP5-Frontend)
+
+
 ## 🚀 Démarrage Rapide
 
 ```bash
@@ -92,6 +96,7 @@ curl http://localhost:5001/api/users
 - **Architecture Clean Code** (Repositories, Services, Controllers)
 - **API REST** complète
 - **100 utilisateurs de test** générés automatiquement
+- Gestion de **l'authentification** & implémentation de **routes protégée**
 
 ---
 
